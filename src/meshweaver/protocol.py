@@ -47,3 +47,14 @@ def verify_message(message: dict, secret: str) -> bool:
         signature,
         expected
     )
+
+import json
+
+# add at bottom
+
+def encode_message(message: dict) -> bytes:
+    return json.dumps(message).encode()
+
+
+def decode_message(data: bytes) -> dict:
+    return json.loads(data.decode())
