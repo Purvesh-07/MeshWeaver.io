@@ -123,3 +123,73 @@ class Node:
         except asyncio.TimeoutError:
             self.pending.pop(message_id, None)
             return None
+
+    def register_dht_handlers(
+        self,
+        dht,
+    ):
+        self.dht = dht
+
+        async def handle_store(
+            message,
+            addr,
+        ):
+            body = message["body"]
+
+            dht.store(
+                body["key"],
+                body["value"],
+            )
+
+            return (
+                "STORE_OK",
+                {},
+            )
+
+        async def handle_find_value(
+            message,
+            addr,
+        ):
+            key = message["body"]["key"]
+
+            value = dht.find_value(key)
+
+            return (
+                "FOUND_VALUE",
+                {
+                    "value": value
+                },
+            )
+
+        async def handle_find_node(
+            message,
+            addr,
+        ):
+            target = message["body"]["node_id"]
+
+            peers = dht.find_node(target)
+
+            return (
+                "FOUND_NODE",
+                {
+                    "peers": [
+                        peer.as_dict()
+                        for peer in peers
+                    ]
+                },
+            )
+
+        self.on(
+            "STORE",
+            handle_store,
+        )
+
+        self.on(
+            "FIND_VALUE",
+            handle_find_value,
+        )
+
+        self.on(
+            "FIND_NODE",
+            handle_find_node,
+        )

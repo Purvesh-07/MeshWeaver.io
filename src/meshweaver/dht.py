@@ -1,3 +1,11 @@
+FIND_NODE = "FIND_NODE"
+STORE = "STORE"
+FIND_VALUE = "FIND_VALUE"
+FOUND_VALUE = "FOUND_VALUE"
+FOUND_NODE = "FOUND_NODE"
+STORE_OK = "STORE_OK"
+
+
 from dataclasses import dataclass
 
 
@@ -12,6 +20,13 @@ class Peer:
     def address(self):
         return (self.host, self.port)
 
+    def as_dict(self):
+        return {
+            "node_id": self.node_id,
+            "hex_id": self.hex_id,
+            "host": self.host,
+            "port": self.port,
+        }
 
 def xor_distance(a: int, b: int) -> int:
     return a ^ b
@@ -78,3 +93,31 @@ class DHT:
             target_id,
             limit,
         )
+
+    def bootstrap(
+        self,
+        peers: list[Peer],
+    ):
+       for peer in peers:
+           self.routing.add_peer(peer) 
+
+    def store(
+        self,
+        key: str,
+        value,
+    ):
+        self.storage[key] = value
+
+        return True
+
+    def find_node(
+        self,
+        target_id: int,
+        limit: int = 3,
+    ):
+        return self.routing.nearest(
+            target_id,
+            limit,
+    ) 
+
+    
