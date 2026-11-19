@@ -76,3 +76,23 @@ def test_find_node():
     result = dht.find_node(10)
 
     assert result[0].node_id == 10
+
+def test_distributed_store():
+
+    dht_a = DHT(1)
+    dht_b = DHT(2)
+
+    dht_a.store(
+        "k",
+        "v"
+    )
+
+    dht_b.store(
+        "k",
+        "v"
+    )
+
+    assert (
+        dht_b.find_value("k")
+        == "v"
+    )
