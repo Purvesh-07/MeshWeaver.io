@@ -1,45 +1,40 @@
 from meshweaver.tasks import (
-    serialize_task,
-    execute_payload,
+    WorkerState,
+    TaskRouter,
+    TASK_ACCEPT,
 )
-
-def square(x):
-    return x * x
-
-def test_execute():
-
-    payload = serialize_task(
-        square,
-        (12,),
-        {},
-    )
-
-    assert execute_payload(
-        payload
-    ) == 144
-
-import pytest
 
 from meshweaver.tasks import (
-    serialize_task,
-    execute_payload,
-    RemoteTaskError,
+    WorkerState,
+    TaskRouter,
+    TASK_REJECT,
 )
 
-def bad():
-    return 1 / 0
+def test_accept():
 
-def test_remote_error():
+    state = WorkerState()
 
-    payload = serialize_task(
-        bad,
-        (),
-        {},
-    )
+    router = TaskRouter(None)
 
-    with pytest.raises(
-        RemoteTaskError
-    ):
-        execute_payload(
-            payload
+    assert (
+        router.offer_task(
+            state
         )
+        == TASK_ACCEPT
+    )
+def test_reject():
+
+    state = WorkerState()
+
+    state.max_tasks = 1
+    state.inflight = 1
+
+    router = TaskRouter(None)
+
+    assert (
+        router.offer_task(
+            state
+        )
+        == TASK_REJECT
+    )
+    
