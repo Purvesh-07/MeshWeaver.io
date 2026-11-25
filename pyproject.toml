@@ -25,5 +25,6 @@ where = ["src"]
 package-dir = {"" = "src"}
 
 dependencies = [
-    "cloudpickle"
+    "cloudpickle",
+    "rich"
 ]
